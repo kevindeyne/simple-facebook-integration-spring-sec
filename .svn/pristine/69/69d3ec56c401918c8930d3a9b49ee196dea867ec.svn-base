@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head></head>
+  <body>
+    <div th:fragment="menu">
+      <ul>
+      	<li><a>HOME</a></li>
+      	<li><a>BROWSE</a></li>
+      	<li><a>WRITER DESK</a></li>
+      	<li><a>WISHLIST</a></li>
+      	<li><a>ACCOUNT</a></li>
+      </ul>
+    </div>
+  </body>
+</html>

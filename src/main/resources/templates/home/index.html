@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}"/>	
+</head>
+<body>
+	<!-- Description -->
+	<div th:replace="fragments/menu :: menu">&nbsp;</div>
+	
+	<h1>Spring security example</h1>
+	
+	<p>This illustrates, in the most basic way, how to attach a simple facebook login to your spring security application.</p>
+	<p>You can read more at <a href="http://www.scorgar.be/blog/development-how-to-simple-integration-of-a-facebook-login-with-spring-security-framework">my blog</a>.</p>
+	
+	<hr/>
+	
+	<!-- Show user is logged in or not -->
+    <p sec:authorize="isAnonymous()">You are currently not logged in.</p>    
+    <p sec:authorize="isAuthenticated()">You just logged in, <strong><span th:text="${user.username}"></span></strong>. Great job!</p>
+    
+    <!-- Facebook image -->
+    <p><img sec:authorize="isAuthenticated()" th:src="${user.facebookImage}" width="95" height="95" /></p>
+    
+    <!-- Provide action buttons based on login state -->
+    <button id="facebook-login" sec:authorize="isAnonymous()">Log me in with facebook</button>
+    <button id="facebook-logout" sec:authorize="isAuthenticated()">Log me out</button>   
+    
+    <!-- Use facebook SDK script on every page, so make this a reusable component -->
+    <th:block th:replace="fragments/scripts :: scriptblock">&nbsp;</th:block>
+</body>
+</html>

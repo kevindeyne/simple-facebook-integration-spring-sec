@@ -1,0 +1,12 @@
+package com.redleafbooks.page.browse.data;
+
+import java.util.List;
+
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+public interface BrowseItemRepository extends PagingAndSortingRepository<BrowseItem, Long> {
+
+	//TODO wss deleten voor gwne list
+	List<BrowseItem> findByTitle(String title);
+
+}

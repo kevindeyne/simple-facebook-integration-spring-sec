@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+	<div th:replace="fragments/menu :: menu">&nbsp;</div>
+	
+	<h1>Red Leaf Books</h1>
+	
+	<p>Browse</p>	
+
+	<div class="book-item" th:each="book : ${books}">
+	 <h2 th:text="${book.title}"></h2>
+	 <p>Blah blah</p>
+	</div>
+	
+	<div>
+		<button id="load-more-books">Load more ...</button>
+	</div>
+			
+	<script type="text/javascript" th:inline="javascript">
+	/*<![CDATA[*/
+		$(function(){
+			//infinite load mock
+			$("#load-more-books").click(function(){
+				var dir = "asc";
+				var index = 2;
+				var prop = "title";
+				
+				var url = /*[[${urlLoadNextPage}]]*/;
+				url = url.replace("{index}", index)
+						 .replace("{prop}", prop)
+						 .replace("{dir}", dir);
+								
+				$.ajax({
+				  dataType: "json",
+				  url: url,
+				  success: function(data){
+					var j_div = $("<div/>").addClass("book-item");
+									 
+					for(i = 0; i < data.content.length; i++){
+						var content = data.content[i];
+						var j_h2 = $("<h2/>").text(content.title);
+						var j_p = $("<p/>").text("Bleh bleh");
+						
+						j_div.append(j_h2);
+						j_div.append(j_p);
+					}
+					
+					$(".book-item:last").append(j_div);
+				  },
+				  error: function(){
+					  alert("error");
+				  }
+				});
+			});
+		});
+	/*]]>*/
+	</script>
+	
+    <p th:text="'Model test: Hello, ' + ${name} + '!'" />
+</body>
+</html>

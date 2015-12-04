@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Getting Started: Serving Web Content</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+</head>
+<body>
+	<div th:replace="fragments/menu :: menu">&nbsp;</div>
+	
+	<h1>Red Leaf Books</h1>
+	
+	<p>Browse</p>	
+
+	<div class="book-item" th:each="book : ${books}">
+	 <h2 th:text="${book.title}"></h2>
+	 <p>Blah blah</p>
+	</div>
+	
+	<div>
+		<button id="load-more-books">Load more ...</button>
+	</div>
+	
+	<script type="text/javascript">
+		$(function(){
+			$("#load-more-books").click(function(){
+				
+			});
+		});
+	</script>
+	
+    <p th:text="'Model test: Hello, ' + ${name} + '!'" />
+</body>
+</html>

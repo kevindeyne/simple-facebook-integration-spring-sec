@@ -1,0 +1,140 @@
+package com.redleafbooks.page.browse;
+
+import java.util.Collections;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.mobile.device.Device;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.redleafbooks.page.AbstractController;
+import com.redleafbooks.page.browse.data.BrowseItem;
+import com.redleafbooks.page.browse.data.BrowseItemRepository;
+
+@Controller
+public class BrowseController extends AbstractController {
+
+
+	private static final String MAPPING_INDEX = "/browse";
+	private static final String MAPPING_PAGE_LOAD = "/browse-json/{index}/{prop}/{dir}";
+
+	//Constants
+	private static final int PAGE_SIZE = 15;
+	private static final PageImpl<BrowseItem> EMPTY_ITEM_LIST = new PageImpl<BrowseItem>(Collections.<BrowseItem> emptyList());
+
+	//Thymeleafs
+	private static final String DESKTOP_BROWSE = "browse/browse_desktop";
+	private static final String MOBILE_BROWSE = "browse/browse_mobile";
+
+
+
+	//Services
+	@Autowired
+	private BrowseItemRepository browseItemRepository;
+
+	//Controller mapping - index
+	@RequestMapping(value={MAPPING_INDEX})
+	public String browse(Device device, Model model) {
+		if(isDesktopUser(device)){
+
+			Sort sort = new Sort(Direction.ASC, BrowseItem.TITLE);
+			Page<BrowseItem> books = retrievePageOfBooks(1, sort);
+
+			model.addAttribute("books", books);
+			model.addAttribute("urlLoadNextPage", MAPPING_PAGE_LOAD);
+
+			return DESKTOP_BROWSE;
+		} else {
+			return MOBILE_BROWSE;
+		}
+	}
+
+	//TODO does this belong here / or in UI mediation?
+	/**
+	 * Retrieves a single page of books, based on index and sort provided
+	 * @param pageIndex start loading from here, used for pagination
+	 * @param sort {@link Sort} object, containing direction and one (or more) string versions of the property to sort on
+	 * @return list of {@link Page} objects containing the page-ready {@link BrowseItem} versions of books
+	 */
+	private Page<BrowseItem> retrievePageOfBooks(int pageIndex, Sort sort) {
+		Pageable pageable = new PageRequest(pageIndex, PAGE_SIZE, sort);
+		Page<BrowseItem> books = this.browseItemRepository.findAll(pageable);
+
+		return books;
+	}
+
+
+
+	//Controller mapping - JSON call
+	@RequestMapping(value={MAPPING_PAGE_LOAD})
+	public @ResponseBody Page<BrowseItem> loadNextPageBooks(Device device, Model model,
+			@PathVariable String index, @PathVariable String prop, @PathVariable String dir) {
+
+		if(validJsonParamVaues(prop, dir, index)){
+			Sort sort = new Sort(Direction.fromStringOrNull(dir), prop);
+			Page<BrowseItem> books = retrievePageOfBooks(Integer.parseInt(index), sort);
+
+			return books;
+		}
+
+		return EMPTY_ITEM_LIST;
+	}
+
+	/**
+	 * Validates the json parameters before doing the call
+	 * Sanity checks and parse error catching
+	 * @param prop Property of {@link BrowseItem}
+	 * @param dir {@link Direction}
+	 * @param index page from which to start loading
+	 * @return true if valid, false if invalid
+	 */
+	private Boolean validJsonParamVaues(String prop, String dir, String index) {
+		return validatePossiblePropValues(prop) &&
+				validatePossibleDirValues(dir) &&
+				validatePossibleIndexValues(index);
+	}
+
+
+	/**
+	 * Validate index value: <br/>
+	 *  - Cannot be lower than 1 <br/>
+	 *  - Value needs to be integer
+	 * @param index
+	 * @return true if valid, false if invalid
+	 */
+	private Boolean validatePossibleIndexValues(String index) {
+		try{
+			int providedValue = Integer.parseInt(index);
+			return providedValue >=1;
+		}catch(NumberFormatException e){
+			return Boolean.FALSE;
+		}
+	}
+
+	/**
+	 * Validates the dir provided is an actual {@link Direction} value
+	 * @param dir
+	 * @return true if valid, false if invalid
+	 */
+	private Boolean validatePossibleDirValues(String dir) {
+		return null != Direction.fromStringOrNull(dir);
+	}
+
+	/**
+	 * Validates if actually a property of {@link BrowseItem}
+	 * @param prop
+	 * @return true if valid, false if invalid
+	 */
+	private Boolean validatePossiblePropValues(String prop) {
+		return BrowseItem.TITLE.equals(prop); //TODO more values
+	}
+}

@@ -1,0 +1,24 @@
+package com.redleafbooks.page.browse;
+
+import org.springframework.mobile.device.Device;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.redleafbooks.page.AbstractController;
+
+@Controller
+public class BrowseController extends AbstractController {
+
+	@RequestMapping(value={"/browse"})
+	public String browse(Device device, Model model) {
+
+		if(isDesktopUser(device)){
+			return "browse/index";
+		} else {
+			return "browse/mobile-index";
+		}
+
+	}
+
+}
