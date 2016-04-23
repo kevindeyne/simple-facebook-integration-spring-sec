@@ -1,4 +1,4 @@
-package com.redleafbooks.core.domain;
+package com.kevindeyne.web.domain;
 
 import java.io.Serializable;
 

@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+	    <title>Example of a simple Facebook integration with Spring Security</title>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    
+	    <meta name="_csrf" th:content="${_csrf.token}" />
+		<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+	</head>
+	<body>
+		<h1>Spring security example</h1>
+			
+		<p>This illustrates, in the most basic way, how to attach a simple facebook login to your spring security application.</p>
+		<p>You can read more at <a href="http://www.scorgar.be/blog/development-how-to-simple-integration-of-a-facebook-login-with-spring-security-framework">my blog</a>.</p>
+		
+		<hr/>
+		
+		<!-- Show user is logged in or not -->
+	    <p sec:authorize="isAnonymous()">You are currently not logged in.</p>   
+	    <p sec:authorize="isAuthenticated()">You just logged in, <strong><span th:text="${user.username}"></span></strong>. Great job!</p>
+	    
+	    <!-- Facebook image -->
+	    <p><img th:src="${user.facebookImage}" width="95" height="95" sec:authorize="isAuthenticated()" /></p>
+	    
+	    <!-- Provide action buttons based on login state -->
+	    <form id="facebook-login"  action="/connect/facebook" method="POST" sec:authorize="isAnonymous()">
+			<input type="hidden" name="scope" value="public_profile,email" />
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+			<button type="submit">Log me in with facebook</button>
+		</form>
+				
+		 <form id="facebook-logout" action="/userlogout" method="POST" sec:authorize="isAuthenticated()">
+			<input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+			<button type="submit">Log me out</button>
+		</form>
+	</body>
+</html>
